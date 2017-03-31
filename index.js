@@ -1,8 +1,11 @@
-var twitch = require("twitch-webchat");
-var auth = require("./twitchAuth.js");
 var TwitchBot = require("node-twitchbot");
-const Bot = new TwitchBot(auth);
+var auth = require("./twitchAuth.js");
+var net = require('net');
+var spawns = [];
+var HOST = 'localhost';
+var PORT = 31655;
 
+var Bot = new TwitchBot(auth);
 Bot.connect().then(() => {
     console.log("Connected to twitch!");
     Bot.listen((err, chatter) => {
@@ -15,11 +18,7 @@ Bot.connect().then(() => {
     });
 });
 
-var net = require('net');
-var HOST = 'localhost';
-var PORT = 31655;
 var client = new net.Socket();
-var spawns = [];
 
 client.connect(PORT, HOST, function() {
     console.log('CONNECTED TO: ' + HOST + ':' + PORT);
@@ -49,8 +48,6 @@ client.on('data', function(data) {
             break;
         case 3:
             if (buffer[3] == 2 & buffer[4] == 0) {
-                console.log(buffer);
-                console.log("spawn created");
                 spawns.push({id: buffer[2]});
             }
             break;
@@ -79,36 +76,9 @@ function getInts(buffer) {
     }
     return intlist;
 }
-/*
-var controls = twitch.start('smbf_quora', (err, message) => {
-  if (err) throw err
-  switch (message.type) {
-    case 'chat': // chat message from the channel 
-      var user = message.from
-      var text = message.text // chat message content as text string 
-      var html = message.html // chat message content as html string 
- 
-      var isModerator = !!message.moderator // user is a moderator 
-      var isSubscriber = !!message.subscriber // user is a subscriber 
-      var isPrime = !!message.prime // user is twitch prime member 
- 
-      console.log(user + ": " + text)
-      addMessage(text, user);
-      break
-    case 'system': // system message from the channel 
-      // (subscription messages, channel mode messages etc) 
-      console.log('[system]: ' + message.text)
-      break
-    case 'tick': // DOM polled for messages 
-    case 'debug': // various debug messages 
-    default: // ignore 
-  };
-});
-*/
+
 function addMessage(user, message) {
     var msgArr = message.toString().split(" ");
-    console.log(spawns);
-    console.log(msgArr);
     switch(msgArr[0]) {
         case '!spawn':
             var arr = new Uint32Array(4);
@@ -138,5 +108,4 @@ function addMessage(user, message) {
         default:
             break;
     }
-
 }
