@@ -1,0 +1,14 @@
+{
+  "name": "gametwitch",
+  "version": "1.0.0",
+  "description": "Get commands for ClusterDoom from twitch chat",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Max Prettyjohns",
+  "license": "ISC",
+  "dependencies": {
+    "twitch-irc": "^1.2.7"
+  }
+}
