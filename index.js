@@ -21,14 +21,15 @@ Bot.connect().then(() => {
 var client = new net.Socket();
 
 client.connect(PORT, HOST, function() {
+    //write message once connected to game
     console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-    // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
 });
 
 client.on('data', function(data) {
     buffer = getInts(data);
     switch(buffer[1]) {
         case 0:
+            //Security packet
             console.log('welcome');
             console.log('verify this: ' + buffer[2]);
 
@@ -40,13 +41,16 @@ client.on('data', function(data) {
             client.write(buf);
             break;
         case 1:
+            //connected to game
             console.log('confirm connect');
             break;
         case 2:
+            //disconnected from game
             console.log('disconnect');
             client.close();
             break;
         case 3:
+            //spawn created, so add it to spawnlist
             if (buffer[3] == 2 & buffer[4] == 0) {
                 spawns.push({id: buffer[2]});
             }
@@ -70,6 +74,7 @@ function security(token) {
 }
 
 function getInts(buffer) {
+    //get event from buffer
     intlist = [];
     for(i = 0; i < buffer.length; i += 4) {
         intlist.push(buffer.readUInt32LE(i));
@@ -78,8 +83,10 @@ function getInts(buffer) {
 }
 
 function addMessage(user, message) {
+    //see message from twitch
     var msgArr = message.toString().split(" ");
     switch(msgArr[0]) {
+        //Spawn message from users
         case '!spawn':
             var arr = new Uint32Array(4);
             if (spawns.length > msgArr[2]) {
@@ -103,6 +110,7 @@ function addMessage(user, message) {
                 Bot.msg("Sorry @" + user + " that spawn is unavailable BabyRage");
             }
             break;
+        //Help users see how message should be formatted
         case '!help':
             Bot.msg("Type '!spawn (robot/wizard) (location)' to play, for example '!spawn robot 1'");
         default:
